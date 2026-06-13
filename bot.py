@@ -2,11 +2,15 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
 import os
 import google.generativeai as genai
+
+# TOKENS
 TOKEN = os.getenv("BOT_TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
+# GEMINI SETUP
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
+
 user_state = {}
 
 if not TOKEN:
@@ -55,38 +59,36 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("✍️ Ab apna topic / idea likho:")
         return
 
-    # STEP 3: GENERATE STORY (NO FIXED EXAMPLES)
+    # STEP 3: GENERATE STORY (GEMINI AI)
     if isinstance(state, dict) and "lang" in state:
         story_type = state["type"]
         lang = state["lang"]
         topic = text
 
         prompt = f"""
-Create a complete {story_type} script in {lang}.
+Create a complete {story_type} story in {lang} language.
 
 Topic: {topic}
 
-Requirements:
-- Write a full detailed script
-- Make it engaging and cinematic
-- Do not give placeholders
-- Give complete story/script
-- Suitable for YouTube video
+Make it:
+- Very engaging
+- Cinematic
+- Full detailed story
+- No placeholders
+- YouTube ready script
 """
 
-try:
-        response = model.generate_content(prompt)
-        script = response.text
-    except Exception as e:
-        script = "⚠️ AI error aaya hai, thodi der baad try karo.\n\nError: " + str(e)
-
-    await update.message.reply_text(script)
-    user_state[user_id] = None
+        try:
+            response = model.generate_content(prompt)
+            script = response.text
+        except Exception as e:
+            script = "⚠️ AI error, try again later.\n\nError: " + str(e)
 
         await update.message.reply_text(script)
         user_state[user_id] = None
 
-# APP
+
+# APP SETUP
 app = Application.builder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
@@ -95,4 +97,3 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
 print("FlowAI Bot Running...")
 app.run_polling()
-
