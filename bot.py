@@ -74,10 +74,11 @@ Requirements:
 - Suitable for YouTube video
 """
 
-response = model.generate_content(prompt)
-
-script = response.text
-
+try:
+    response = model.generate_content(prompt)
+    script = response.text
+except Exception as e:
+    script = "⚠️ AI error aaya hai, thodi der baad try karo.\n\nError: " + str(e)
 
 
 
