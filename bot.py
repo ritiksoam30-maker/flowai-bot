@@ -75,12 +75,13 @@ Requirements:
 """
 
 try:
-    response = model.generate_content(prompt)
-    script = response.text
-except Exception as e:
-    script = "⚠️ AI error aaya hai, thodi der baad try karo.\n\nError: " + str(e)
+        response = model.generate_content(prompt)
+        script = response.text
+    except Exception as e:
+        script = "⚠️ AI error aaya hai, thodi der baad try karo.\n\nError: " + str(e)
 
-
+    await update.message.reply_text(script)
+    user_state[user_id] = None
 
         await update.message.reply_text(script)
         user_state[user_id] = None
