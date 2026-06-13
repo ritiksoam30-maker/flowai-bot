@@ -78,6 +78,9 @@ response = model.generate_content(prompt)
 
 script = response.text
 
+
+
+
         await update.message.reply_text(script)
         user_state[user_id] = None
 
